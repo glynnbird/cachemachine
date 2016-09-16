@@ -1,0 +1,7 @@
+.DS_Store
+node_modules
+start.sh
+.settings
+.project
+npm-debug.log
+.vscode
