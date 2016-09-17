@@ -4,14 +4,10 @@
 as the cache data-store but can be used without it in a single-node configuration during development.
 
 ```js
-// startup cachemachine
-var cachemachine = require('cachemachine')();
-// cache everything for 2 minutes
-cachemachine.addPath(/.*/, 120);
-// get a request object
-var request = cachemachine.request();
+// startup cachemachine (default = cache every GET request for 1 hour)
+var request = require('cachemachine')();
 // make a request
-request('http://www.google.com/', function(e,h,b) {
+request('http://www.google.com/', function(e, r, b) {
   // at this point, the request has completed and has been cached too
   console.log(b);
 });
@@ -36,47 +32,38 @@ var cachemachine = require('cachemachine')();
 or with Redis (localhost:6379)
 
 ```js
-var cachemachine = require('cachemachine')(true);
+var cachemachine = require('cachemachine')({redis: true});
 ```
 
 or with a remote Redis server: 
 
 ```js
 var opts = {
+  redis: true,
   hostname: 'myredisserver.com',
   port: 8000,
   password: 'mysecretpassword'
 };
-var cachemachine = require('cachemachine')(opts);
+var request = require('cachemachine')(opts);
 ```
 
 ## Configure paths to cache
 
-To specify which paths you'd like to be cached by *cachemachine*, then call the `addPath` function supplying a regular expression (or a string 
-that compiles to a regular expression) that will be used to match the path of URLs you fetch at a later time e.g.:
+To specify which paths you'd like to be cached by *cachemachine*, then supply a `paths` parameter containing an array of objects e.g.:
 
 ```js
-// cache any URL whose path matches /api/v1/*
-cachemachine.addPath('/api/v1/.*', 60);
+var opts = {
+  paths: [
+    { path: '/api/v1/.*', ttl: 3600 }
+  ]
+};
+var request = require('cachemachine')(opts);
 ```
 
-The second parameter is the TTL (time to live) of the cache, in this case 60 seconds.
+The objects that you pass in should containing
 
-The `addPath` function can be called many times to add a range of paths:
-
-```js
-cachemachine.addPath('^/api/v1/books', 3600);
-cachemachine.addPath('^/api/v1/electricals/tv/.*', 7200);
-cachemachine.addPath(/^\/api\/v[0-9]+\/pets\/.*/, 14400);
-```
-
-### Get a request object
-
-Instead of using the usual `request` npm module to do your HTTP work, create a custom `request` object from *cachemachine*:
-
-```js
-var request = cachemachine.request();
-```
+- path - a string or RegExp that defines the path you wish to match
+- ttl - the time-to-live of the cache key in seconds
 
 ### Make requests
 
