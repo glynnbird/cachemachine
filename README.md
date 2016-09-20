@@ -1,7 +1,18 @@
 # cachemachine
 
-*cachemachine* is a simple caching engine for the HTTP request your Node.js applications make. It is designed to be run with Redis 
+*cachemachine* is a simple caching engine for the HTTP GET requests your Node.js applications make. It is designed to be run with Redis 
 as the cache data-store but can be used without it in a single-node configuration during development.
+
+Normally, to create an HTTP request, you would use the [request](https://www.npmjs.com/package/request) library like so: 
+
+```js
+  var request = require('request');
+  request('http://www.google.com/', function(e, r, b) {
+
+  });
+```
+
+If you use *cachemachine* instead you can do this:
 
 ```js
 // startup cachemachine (default = cache every GET request for 1 hour)
@@ -12,6 +23,8 @@ request('http://www.google.com/', function(e, r, b) {
   console.log(b);
 });
 ```
+
+And subsequent requests for the same content will be returned from an in-memory cache without making the same request again.
 
 ## Installation
 
@@ -75,7 +88,7 @@ request({method: 'get', url: 'http://mydomain.com/api/v1/books/123', qs: {limit:
 });
 ``` 
 
-Note that cachemachine's request object only supports being called with a single 'object' parameter. It doesn't support Node.js streaming, nor can 
+Note that cachemachine's request object only supports being called with a single 'object' or string parameter. It doesn't support Node.js streaming, nor can 
 you use the `.get`, `.post` helpers.
 
 ### How does it work?
@@ -84,8 +97,7 @@ When an outgoing request is made through *cachemachine* where the path matches o
 are formed into a hash. This becomes the cache key for the cache data store. If the request can be retrieved from cache, it is 
 fetched and the callback called. If the item is not in cache, it is fetched using a real 'request' object, cached and then returned to you.
 
-
 ### Why cachemachine?
 
 If you're using `request` already and don't want to change your code, then you can use *cachemachine* as a drop-in replacement and decide which
-HTTP calls to cache and for how long. This can take the load of over-burdened API servers and to speed up your service.
+HTTP calls to cache and for how long. This can take the load of over-burdened API servers and speed up your service.
