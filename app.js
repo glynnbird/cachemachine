@@ -59,12 +59,16 @@ module.exports = function(opts) {
       };
     }
     if (!req.method || req.method.toLowerCase() === 'get') {
-      var parsed = URL.parse(req.url);
+      var u = req.url || req.uri;
+      if (!u) {
+        throw('missing url/uri');
+      }
+      var parsed = URL.parse(u);
       var path = parsed.pathname;
       var ttl = inScope(path);
       debug(`TTL ${ttl}`);
       if (ttl) {
-        var hash = calculateCacheHash(req.url, req.qs);
+        var hash = calculateCacheHash(u, req.qs);
         cache.get(hash, function(err, data) {
           if (err || !data) {
             debug(`Cache Miss ${hash}`);

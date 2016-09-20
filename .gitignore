@@ -4,4 +4,5 @@ start.sh
 .settings
 .project
 npm-debug.log
+test*.js
 .vscode
