@@ -1,4 +1,4 @@
-var pathstore = require('../lib/pathstore.js'),
+var pathstore = require('../lib/pathstore.js')(),
   assert = require('assert');
 
 describe('Pathstore', function() {

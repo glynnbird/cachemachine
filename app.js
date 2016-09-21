@@ -3,7 +3,7 @@ module.exports = function(opts) {
   var URL = require('url');
   var cache = null;
   var debug = require('debug')('cachemachine');
-  var pathstore = require('./lib/pathstore.js');
+  var pathstore = require('./lib/pathstore.js')();
   var hash = require('./lib/hash.js');
 
   if (opts && opts.redis) {
