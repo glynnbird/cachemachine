@@ -1,5 +1,7 @@
 # cachemachine
 
+[![Build Status](https://travis-ci.org/glynnbird/cachemachine.svg?branch=master)](https://travis-ci.org/glynnbird/cachemachine)
+
 *cachemachine* is a simple caching engine for the HTTP GET requests your Node.js applications make. It is designed to be run with Redis 
 as the cache data-store but can be used without it in a single-node configuration during development.
 
