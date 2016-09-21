@@ -1,4 +1,6 @@
-module.exports = function(opts) {
+'use strict';
+
+module.exports = function (opts) {
   var client = require('request');
   var URL = require('url');
   var cache = null;
@@ -38,19 +40,19 @@ module.exports = function(opts) {
       var parsed = URL.parse(u);
       var path = parsed.pathname;
       var ttl = pathstore.inScope(path);
-      debug(`TTL ${ttl}`);
+      debug('TTL', ttl);
       if (ttl) {
         var h = hash.calculate(u, req.qs);
         cache.get(h, function(err, data) {
           if (err || !data) {
-            debug(`Cache Miss ${h}`);
+            debug('Cache Miss', h);
             client(req, function(e, r, b) {
               cache.put(h, { e:e, r:r, b:b} , ttl, function() {
               });
               callback(e, r, b);
             });
           } else {
-            debug(`Cache Hit ${h}`);
+            debug('Cache Hit', h);
             callback(data.e, data.r, data.b);
           }
         });
