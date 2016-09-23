@@ -8,6 +8,17 @@ describe('cachemachine', function() {
     assert.equal(typeof request, 'function');
   });
 
+  it('should expose the correct functions', function() {
+    var request = require('../app.js')();
+    assert.equal(typeof request.get, 'function');
+    assert.equal(typeof request.head, 'function');
+    assert.equal(typeof request.post, 'function');
+    assert.equal(typeof request.put, 'function');
+    assert.equal(typeof request.patch, 'function');
+    assert.equal(typeof request.del, 'function');
+    assert.equal(typeof request['delete'], 'function');
+  });
+
   it('should make http requests and cache them', function(done) {
     var request = require('../app.js')();
     var mocks = nock('http://localhost')
