@@ -7,6 +7,7 @@ module.exports = function (opts) {
   var debug = require('debug')('cachemachine');
   var pathstore = require('./lib/pathstore.js')();
   var hash = require('./lib/hash.js');
+  var extend = require('extend');
 
   if (opts && opts.redis) {
     debug('Using Redis cache');
@@ -25,13 +26,27 @@ module.exports = function (opts) {
     pathstore.add({path: /.*/, ttl: 60*60});
   }
 
-  var request = function(req, callback) {
-    if (typeof req === 'string') {
-      req = {
-        method: 'get',
-        url: req
-      };
+  function initParams(uri, options, callback) {
+    if (typeof options === 'function') {
+      callback = options
     }
+
+    var params = {}
+    if (typeof options === 'object') {
+      extend(params, options, {uri: uri})
+    } else if (typeof uri === 'string') {
+      extend(params, {uri: uri})
+    } else {
+      extend(params, uri)
+    }
+
+    params.callback = callback || params.callback
+    return params
+  }
+
+  var request = function(req, options, callback) {
+    req = initParams(req, options, callback);
+    callback = req.callback;
     if (!req.method || req.method.toLowerCase() === 'get') {
       var u = req.url || req.uri;
       if (!u) {
@@ -62,7 +77,41 @@ module.exports = function (opts) {
     }
   };
 
+  function initParams(uri, options, callback) {
+    if (typeof options === 'function') {
+      callback = options
+    }
 
+    var params = {}
+    if (typeof options === 'object') {
+      extend(params, options, {uri: uri})
+    } else if (typeof uri === 'string') {
+      extend(params, {uri: uri})
+    } else {
+      extend(params, uri)
+    }
+
+    params.callback = callback || params.callback
+    return params
+  }
+
+
+  function verbFunc (verb) {
+    var method = verb.toUpperCase()
+    return function (uri, options, callback) {
+      var params = initParams(uri, options, callback)
+      params.method = method
+      return request(params, params.callback)
+    }
+  };
+
+  request.get = verbFunc('get');
+  request.head = verbFunc('head');
+  request.post = verbFunc('post');
+  request.put = verbFunc('put');
+  request.patch = verbFunc('patch');
+  request.del = verbFunc('delete');
+  request['delete'] = verbFunc('delete');
 
   return request;
 };

@@ -90,8 +90,7 @@ request({method: 'get', url: 'http://mydomain.com/api/v1/books/123', qs: {limit:
 });
 ``` 
 
-Note that cachemachine's request object only supports being called with a single 'object' or string parameter. It doesn't support Node.js streaming, nor can 
-you use the `.get`, `.post` helpers.
+Note that cachemachine's request object only supports being called with a single 'object' or string parameter or using the get/head/post/put/patch/del helper functions. It does **not** support Node.js streaming.
 
 ### How does it work?
 
