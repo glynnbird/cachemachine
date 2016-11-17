@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/glynnbird/cachemachine.svg?branch=master)](https://travis-ci.org/glynnbird/cachemachine)
 
-*cachemachine* is a simple caching engine for the HTTP GET requests your Node.js applications make. It is designed to be run with Redis 
+*cachemachine* is a simple caching engine for HTTP GET requests that your Node.js applications make. It is designed to be run with Redis 
 as the cache data-store but can be used without it in a single-node configuration during development.
 
 Normally, to create an HTTP request, you would use the [request](https://www.npmjs.com/package/request) library like so: 
@@ -75,14 +75,14 @@ var opts = {
 var request = require('cachemachine')(opts);
 ```
 
-The objects that you pass in should containing
+The objects that you pass in should contain:
 
 - path - a string or RegExp that defines the path you wish to match
 - ttl - the time-to-live of the cache key in seconds
 
 ### Make requests
 
-Simply use the request object as normal.
+Simply use the request object as normal:
 
 ```js
 request({method: 'get', url: 'http://mydomain.com/api/v1/books/123', qs: {limit:20}}, function(e, h, b) {
@@ -94,7 +94,7 @@ Note that cachemachine's request object only supports being called with a single
 
 ### How does it work?
 
-When an outgoing request is made through *cachemachine* where the path matches on of your regular expressions,  the url and query string 
+When an outgoing request is made through *cachemachine* where the path matches one of your regular expressions, the url and query string 
 are formed into a hash. This becomes the cache key for the cache data store. If the request can be retrieved from cache, it is 
 fetched and the callback called. If the item is not in cache, it is fetched using a real 'request' object, cached and then returned to you.
 
