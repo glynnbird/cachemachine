@@ -90,7 +90,12 @@ request({method: 'get', url: 'http://mydomain.com/api/v1/books/123', qs: {limit:
 });
 ``` 
 
-Note that cachemachine's request object only supports being called with a single 'object' or string parameter or using the get/head/post/put/patch/del helper functions. It does **not** support Node.js streaming.
+Note that cachemachine's request object supports being called with a single 'object' or string parameter or using the get/head/post/put/patch/del helper functions. It also supports Node.js streaming.
+
+
+```js
+request.get('http://mydomain.com/api/v1/books/123').pipe(process.stdout);
+``` 
 
 ### How does it work?
 
@@ -123,5 +128,3 @@ db.view('clicks', 'byday', {group: true}, function(err, data) {
   console.log(data);
 });
 ```
-
-

@@ -1,6 +1,6 @@
 {
   "name": "cachemachine",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "HTTP Request caching shim",
   "main": "app.js",
   "directories": {
@@ -26,13 +26,13 @@
   },
   "homepage": "https://github.com/glynnbird/cachemachine#readme",
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "^2.3.2",
     "extend": "^3.0.0",
-    "redis": "^2.6.2",
-    "request": "^2.74.0"
+    "redis": "^2.6.3",
+    "request": "^2.78.0"
   },
   "devDependencies": {
-    "mocha": "^3.0.2",
-    "nock": "^8.0.0"
+    "mocha": "^3.1.2",
+    "nock": "^9.0.2"
   }
 }

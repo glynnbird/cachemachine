@@ -8,7 +8,9 @@ module.exports = function (opts) {
   var pathstore = require('./lib/pathstore.js')();
   var hash = require('./lib/hash.js');
   var extend = require('extend');
+  var stream = require('stream');
 
+  // choose Redis or in-memory cache
   if (opts && opts.redis) {
     debug('Using Redis cache');
     cache = require('./lib/rediscache')(opts);
@@ -17,15 +19,17 @@ module.exports = function (opts) {
     cache = require('./lib/inmemorycache')();
   }
 
+  // create a store of path regex/ttl pairs
   if (opts && opts.paths) {
     for(var i in opts.paths) {
       pathstore.add(opts.paths[i]);
     }
   } else {
-    // cache everything for one hour
+    // or, cache everything for one hour
     pathstore.add({path: /.*/, ttl: 60*60});
   }
 
+  // parses parameters to request
   function initParams(uri, options, callback) {
     if (typeof options === 'function') {
       callback = options
@@ -44,9 +48,25 @@ module.exports = function (opts) {
     return params
   }
 
+  // empty callback
+  var nullcallback = function() { }
+
+  // this is our replacement 'request' function
   var request = function(req, options, callback) {
+
+    // create a pass-through stream in case the caller wishes
+    // to pipe data using Node.js streams
+    var s = new stream.PassThrough();
+
+    // initialise parameters
     req = initParams(req, options, callback);
     callback = req.callback;
+    if (!callback) {
+      callback = nullcallback;
+    }
+    debug(req);
+
+    // only cache GET requests
     if (!req.method || req.method.toLowerCase() === 'get') {
       var u = req.url || req.uri;
       if (!u) {
@@ -54,27 +74,52 @@ module.exports = function (opts) {
       }
       var parsed = URL.parse(u);
       var path = parsed.pathname;
+
+      // check if path is one that is to be cached
       var ttl = pathstore.inScope(path);
       debug('TTL', ttl);
       if (ttl) {
+
+        // calculate hash from the URL and the query string
         var h = hash.calculate(u, req.qs);
+
+        // see if we have a cached value
         cache.get(h, function(err, data) {
+
+          // if not
           if (err || !data) {
+
+            // fetch using HTTP
             debug('Cache Miss', h);
+            var statusCode = 500;
             client(req, function(e, r, b) {
-              cache.put(h, { e:e, r:r, b:b} , ttl, function() {
-              });
+              cache.put(h, { e:e, r:r, b:b} , ttl, function() {});
               callback(e, r, b);
-            });
+            }).on('response', function(r) {
+              statusCode = r && r.statusCode || 500;
+            }).on('data', function(chunk) {
+              if (statusCode < 500) {
+                s.write(chunk);
+              }
+            }); 
+
           } else {
+
+            // return cached value
             debug('Cache Hit', h);
+            s.write(data.b);
             callback(data.e, data.r, data.b);
           }
         });
       } else {
-        return client(req, callback);
+        // if not a GET request to be cached
+        client(req, callback).pipe(s);
       }
+    } else {
+      // if not a GET, just do the request
+      client(req, callback).pipe(s);
     }
+    return s;
   };
 
   function verbFunc (verb) {
