@@ -48,6 +48,9 @@ module.exports = function (opts) {
     return params
   }
 
+  // empty callback
+  var nullcallback = function() { }
+
   // this is our replacement 'request' function
   var request = function(req, options, callback) {
 
@@ -58,6 +61,10 @@ module.exports = function (opts) {
     // initialise parameters
     req = initParams(req, options, callback);
     callback = req.callback;
+    if (!callback) {
+      callback = nullcallback;
+    }
+    debug(req);
 
     // only cache GET requests
     if (!req.method || req.method.toLowerCase() === 'get') {
@@ -84,23 +91,35 @@ module.exports = function (opts) {
 
             // fetch using HTTP
             debug('Cache Miss', h);
+            var statusCode = 500;
             client(req, function(e, r, b) {
-              cache.put(h, { e:e, r:r, b:b} , ttl, function() {
-              });
+              cache.put(h, { e:e, r:r, b:b} , ttl, function() {});
               callback(e, r, b);
-            });
+            }).on('response', function(r) {
+              statusCode = r && r.statusCode || 500;
+            }).on('data', function(chunk) {
+              if (statusCode < 500) {
+                s.write(chunk);
+              }
+            }); 
+
           } else {
 
             // return cached value
             debug('Cache Hit', h);
+            s.write(data.b);
             callback(data.e, data.r, data.b);
           }
         });
       } else {
-        // if not a GET, just do the request
-        return client(req, callback);
+        // if not a GET request to be cached
+        client(req, callback).pipe(s);
       }
+    } else {
+      // if not a GET, just do the request
+      client(req, callback).pipe(s);
     }
+    return s;
   };
 
   function verbFunc (verb) {

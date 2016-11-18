@@ -1,4 +1,5 @@
 var assert = require('assert'),
+  stream = require('stream'),
   nock = require('nock');
 
 describe('cachemachine', function() {
@@ -6,6 +7,36 @@ describe('cachemachine', function() {
   it('should be a function', function() {
     var request = require('../app.js')();
     assert.equal(typeof request, 'function');
+  });
+
+  it('should return a stream for cache hits', function() {
+    var request = require('../app.js')();
+    var mocks = nock('http://localhost')      
+      .get('/abc').reply(200, 'Hello world');
+    var req = request('http://localhost/abc', function(e, r, b) {
+      assert.equal(b, 'Hello world');
+      assert.equal(req instanceof stream.PassThrough, true);
+    });
+  });
+
+  it('should return a stream for cache misses', function() {
+    var request = require('../app.js')({ paths: [{ path:'/rita', ttl:60}]});
+    var mocks = nock('http://localhost')      
+      .get('/abc').reply(200, 'Hello world');
+    var req = request('http://localhost/abc', function(e, r, b) {
+      assert.equal(b, 'Hello world');
+      assert.equal(req instanceof stream.PassThrough, true);
+    });
+  });
+
+  it('should return a stream for non-GET requests', function() {
+    var request = require('../app.js')();
+    var mocks = nock('http://localhost')      
+      .put('/abc').reply(200, 'Hello world');
+    var req = request.put('http://localhost/abc', function(e, r, b) {
+      assert.equal(b, 'Hello world');
+      assert.equal(req instanceof stream.PassThrough, true);
+    });
   });
 
   it('should expose the correct functions', function() {
