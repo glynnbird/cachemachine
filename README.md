@@ -133,3 +133,12 @@ db.view('clicks', 'byday', {group: true}, function(err, data) {
 Although Glynn's cachemachine provides cool functionality I felt it lacks the capability to explicitly invalidate cache entries.
 Furthermore I want to use it with IBM Redis service that makes use of explicit TLS certificates.
 
+For an example how to use it with IBM Cloud Redis please see `example.js`. Instead of defining hostname, password and port
+```
+var opts = {
+  redis: true,
+  connectionString: "rediss://admin:cf8db6e66bbb6c1f2fe5199fb34a24f85736723ab18d1e46bac979455cd3a4b0@be899aee-eb11-4935-8048-99972d515e25.659dc287bad647f9b4fe17c4e4c38dcc.databases.appdomain.cloud:31962/0"
+  cert: "L***********************************o="
+};
+```
+with connectionString copied from the redis credential entry `connection.rediss.composed[0]` and the certificate from `connection.rediss.certificate.certificate_base64`.
