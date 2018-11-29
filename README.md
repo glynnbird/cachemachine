@@ -1,6 +1,6 @@
 # cachemachine
 
-[![Build Status](https://travis-ci.org/glynnbird/cachemachine.svg?branch=master)](https://travis-ci.org/glynnbird/cachemachine)
+[![Build Status](https://travis-ci.org/glynnbird/cachemachine.svg?branch=master)](https://travis-ci.org/sedgewickmm18/cachemachine)
 
 *cachemachine* is a simple caching engine for HTTP GET requests that your Node.js applications make. It is designed to be run with Redis 
 as the cache data-store but can be used without it in a single-node configuration during development.
@@ -128,3 +128,8 @@ db.view('clicks', 'byday', {group: true}, function(err, data) {
   console.log(data);
 });
 ```
+### Why forking
+
+Although Glynn's cachemachine provides cool functionality I felt it lacks the capability to explicitly invalidate cache entries.
+Furthermore I want to use it with IBM Redis service that makes use of explicit TLS certificates.
+

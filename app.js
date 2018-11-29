@@ -66,8 +66,9 @@ module.exports = function (opts) {
     }
     debug(req);
 
-    // only cache GET requests
-    if (!req.method || req.method.toLowerCase() === 'get') {
+    // only cache GET requests - implement invalidate
+    if (!req.method || req.method.toLowerCase() === 'invalidate' ||
+                          req.method.toLowerCase() === 'get') {
       var u = req.url || req.uri;
       if (!u) {
         throw('missing url/uri');
@@ -85,6 +86,8 @@ module.exports = function (opts) {
 
         // see if we have a cached value
         cache.get(h, function(err, data) {
+
+          if (req.method && req.method.toLowerCase() === 'invalidate') cache.remove(h);
 
           // if not
           if (err || !data) {
