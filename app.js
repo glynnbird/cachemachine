@@ -106,7 +106,7 @@ module.exports = function (opts) {
             client(req, function(e, r, b) {
 
               // only store successful GETs 
-              if (!e && !b) {
+              if (!e) {
                  cache.put(h, { e:e, r:r, b:b} , ttl, function() {});
               }
 
