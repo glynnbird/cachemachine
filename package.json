@@ -1,6 +1,6 @@
 {
   "name": "cachemachine3",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "HTTP Request caching shim",
   "main": "app.js",
   "directories": {
