@@ -104,9 +104,12 @@ module.exports = function (opts) {
             debug('Cache Miss', h);
             var statusCode = 500;
             client(req, function(e, r, b) {
+
               // only store successful GETs 
-              if (!e)
+              if (!e && !b) {
                  cache.put(h, { e:e, r:r, b:b} , ttl, function() {});
+              }
+
               callback(e, r, b);
             }).on('response', function(r) {
               statusCode = r && r.statusCode || 500;
