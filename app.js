@@ -123,7 +123,9 @@ module.exports = function (opts) {
 
             // return cached value
             debug('Cache Hit', h);
-            s.write(data.b);
+            let str = JSON.stringify(data.b);
+            s.write(str);
+
             callback(data.e, data.r, data.b);
           }
         });
