@@ -4,6 +4,7 @@ module.exports = function (opts) {
   var client = require('request');
   var URL = require('url');
   var cache = null;
+  var invalidate = false;
   var debug = require('debug')('cachemachine');
   var pathstore = require('./lib/pathstore.js')();
   var hash = require('./lib/hash.js');
@@ -66,8 +67,11 @@ module.exports = function (opts) {
     }
     debug(req);
 
-    // only cache GET requests
-    if (!req.method || req.method.toLowerCase() === 'get') {
+    invalidate = (req.method && req.method.toLowerCase() === 'invalidate');
+
+    // only cache GET requests - implement invalidate
+    if (!req.method || req.method.toLowerCase() === 'invalidate' ||
+                          req.method.toLowerCase() === 'get') {
       var u = req.url || req.uri;
       if (!u) {
         throw('missing url/uri');
@@ -86,14 +90,26 @@ module.exports = function (opts) {
         // see if we have a cached value
         cache.get(h, function(err, data) {
 
+          if (invalidate) {
+            cache.remove(h, function(){});
+            statusCode = 200;
+            debug('Cache invalidated', h);
+            callback(null, null, 'Cache invalidated');
+          }
+
           // if not
-          if (err || !data) {
+          else if (err || !data) {
 
             // fetch using HTTP
             debug('Cache Miss', h);
             var statusCode = 500;
             client(req, function(e, r, b) {
-              cache.put(h, { e:e, r:r, b:b} , ttl, function() {});
+
+              // only store successful GETs 
+              if (!e) {
+                 cache.put(h, { e:e, r:r, b:b} , ttl, function() {});
+              }
+
               callback(e, r, b);
             }).on('response', function(r) {
               statusCode = r && r.statusCode || 500;
@@ -107,7 +123,9 @@ module.exports = function (opts) {
 
             // return cached value
             debug('Cache Hit', h);
-            s.write(data.b);
+            let str = JSON.stringify(data.b);
+            s.write(str);
+
             callback(data.e, data.r, data.b);
           }
         });
@@ -117,6 +135,7 @@ module.exports = function (opts) {
       }
     } else {
       // if not a GET, just do the request
+      debug('Other request', h);
       client(req, callback).pipe(s);
     }
     return s;
