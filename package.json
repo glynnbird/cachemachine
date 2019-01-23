@@ -1,5 +1,5 @@
 {
-  "name": "cachemachine3",
+  "name": "cachemachine",
   "version": "1.8.0",
   "description": "HTTP Request caching shim",
   "main": "app.js",
