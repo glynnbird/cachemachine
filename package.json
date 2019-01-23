@@ -1,6 +1,6 @@
 {
   "name": "cachemachine3",
-  "version": "1.0.5",
+  "version": "1.8.0",
   "description": "HTTP Request caching shim",
   "main": "app.js",
   "directories": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sedgewickmm18/cachemachine.git"
+    "url": "git+https://github.com/glynnbird/cachemachine.git"
   },
   "keywords": [
     "cache",
@@ -22,17 +22,17 @@
   "author": "Glynn Bird <glynn.bird@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/sedgewickmm18/cachemachine/issues"
+    "url": "https://github.com/glynnbird/cachemachine/issues"
   },
-  "homepage": "https://github.com/sedgewickmm18/cachemachine#readme",
+  "homepage": "https://github.com/glynnbird/cachemachine#readme",
   "dependencies": {
-    "debug": "^2.3.2",
-    "extend": "^3.0.0",
+    "debug": "^4.1.1",
+    "extend": "^3.0.2",
     "redis": "^2.8.0",
-    "request": "^2.78.0"
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "mocha": "^5.2.0",
-    "nock": "^9.0.2"
+    "nock": "^10.0.6"
   }
 }
