@@ -1,13 +1,14 @@
 {
   "name": "cachemachine",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "HTTP Request caching shim",
   "main": "app.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --exit"
+    "standard": "standard --fix",
+    "test": "standard; ./node_modules/mocha/bin/mocha --exit"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,13 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "mocha": "^5.2.0",
-    "nock": "^10.0.6"
+    "mocha": "^6.0.2",
+    "nock": "^10.0.6",
+    "standard": "^12.0.1"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
   }
 }
