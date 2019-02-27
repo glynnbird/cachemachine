@@ -1,6 +1,6 @@
 # cachemachine
 
-[![Build Status](https://travis-ci.org/glynnbird/cachemachine.svg?branch=master)](https://travis-ci.org/sedgewickmm18/cachemachine)
+[![Build Status](https://travis-ci.org/glynnbird/cachemachine.svg?branch=master)](https://travis-ci.org/glynnbird/cachemachine)
 
 *cachemachine* is a simple caching engine for HTTP GET requests that your Node.js applications make. It is designed to be run with Redis 
 as the cache data-store but can be used without it in a single-node configuration during development.
@@ -110,19 +110,19 @@ HTTP calls to cache and for how long. This can take the load of over-burdened AP
 
 ## Using cachemachine to cache CouchDB/Cloudant databases
 
-CouchDB & Cloudant have an HTTP API and you may wish to cache certain GET requests, such as queries on views. The Cloudant Node.js library allows
+Apache CouchDB & Cloudant have an HTTP API and you may wish to cache certain GET requests, such as queries on views. The Cloudant Node.js library allows
 a custom request object to be passed in so we can pass in a pre-configured *cachemachine* object e.g.:
 
 ```js
 var paths = [ { path: '^/mydb/_design/.*', ttl: 60*60 }];
 var cachemachine = require('cachemachine')({paths: paths});
-var cloudant = require('cloudant')({ url: myurl, plugin: cachemachine });
+var nano = require('nano')({ url: myurl, request: cachemachine });
 ```
 
 Then requests that match cachemachine's paths will be cached:
 
 ```
-var db = cloudant.db.use('mydb');
+var db = nano.db.use('mydb');
 db.view('clicks', 'byday', {group: true}, function(err, data) {
   // data is returned and cached transparently
   console.log(data);
